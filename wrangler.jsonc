@@ -1,7 +1,7 @@
 {
 	"compatibility_date": "2026-04-30",
 	"compatibility_flags": ["global_fetch_strictly_public"],
-	"name": "starfolio",
+	"name": "astrofolio",
 	"main": "@astrojs/cloudflare/entrypoints/server",
 	"assets": {
 		"directory": "./dist",
