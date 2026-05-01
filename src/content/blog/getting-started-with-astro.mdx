@@ -1,0 +1,84 @@
+---
+title: "Getting Started with Astro: Build Faster Websites"
+publishedAt: "2026-05-01"
+updatedAt: "2026-05-01"
+author: "Alex Mercer"
+summary: "An introduction to Astro, the modern static site builder that ships zero JavaScript by default and lets you use any framework."
+image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&h=192&fit=crop"
+---
+
+Astro is a web framework built around one idea: ship less JavaScript. Pages are rendered to HTML at build time, and client-side JS is only sent when you explicitly opt in. The result is fast by default — no configuration required.
+
+## Why Astro
+
+- **Zero JS by default.** HTML is shipped as-is unless you add an interactive component.
+- **Bring your own framework.** React, Svelte, Vue, Solid — use any or all of them in the same project.
+- **Content-first.** MDX, Markdown, and content collections are first-class citizens.
+- **Islands architecture.** Interactive components hydrate independently, so slow widgets don't block fast content.
+
+## Your first Astro page
+
+Pages live in `src/pages/` and use the `.astro` extension:
+
+```astro title="src/pages/index.astro"
+---
+const name = "world";
+---
+
+<html lang="en">
+  <head><title>Hello</title></head>
+  <body>
+    <h1>Hello, {name}!</h1>
+  </body>
+</html>
+```
+
+The fenced block at the top (`---`) is server-side JavaScript that runs at build time. The markup below it is your template.
+
+## Adding a React component
+
+Install the React integration, then drop a component into your page with a hydration directive:
+
+```astro title="src/pages/index.astro"
+---
+import Counter from "../components/Counter.tsx";
+---
+
+<h1>My Page</h1>
+<Counter client:load />
+```
+
+`client:load` hydrates immediately. Other options: `client:idle` (when browser is idle) and `client:visible` (when scrolled into view).
+
+## Content collections
+
+Astro's content collections give you type-safe access to Markdown and MDX files:
+
+```ts title="src/content.config.ts"
+import { defineCollection, z } from "astro:content";
+import { glob } from "astro/loaders";
+
+const blog = defineCollection({
+  loader: glob({ pattern: "**/*.mdx", base: "./src/content/blog" }),
+  schema: z.object({
+    title: z.string(),
+    publishedAt: z.string(),
+    summary: z.string(),
+  }),
+});
+
+export const collections = { blog };
+```
+
+Then query it from any page:
+
+```astro
+---
+import { getCollection } from "astro:content";
+const posts = await getCollection("blog");
+---
+```
+
+## Wrap-up
+
+Astro hits a sweet spot: static-site performance with the flexibility to add interactivity exactly where you need it. If you're building a portfolio, blog, or docs site, it's worth 20 minutes to try.

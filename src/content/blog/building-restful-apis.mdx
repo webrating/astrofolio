@@ -1,0 +1,41 @@
+---
+title: "Building RESTful APIs with Node.js and Express"
+publishedAt: "2026-04-10"
+updatedAt: "2026-04-10"
+author: "Alex Mercer"
+summary: "A step-by-step guide to designing and building production-ready REST APIs with Node.js, Express, and proper error handling."
+image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=192&fit=crop"
+---
+
+# TypeScript Best Practices for Clean, Maintainable Code
+
+TypeScript shines when it helps you model reality — not when it forces you to fight types all day. A few small defaults can make a codebase feel <mark>calmer, safer, and easier to refactor</mark>.
+
+<MediaContainer
+  src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&fit=crop"
+  alt="TypeScript code on screen"
+/>
+
+## Practical rules of thumb
+
+- Turn on strictness and fix the sharp edges early.
+- Prefer readable types over clever types.
+- Use unions for “one of these”, interfaces for “shape of this”.
+- Avoid `any` as a shortcut; it becomes ~~future debt~~ fast.
+
+## One pattern worth memorizing
+
+```ts
+type Result<T> =
+  | { ok: true; value: T }
+  | { ok: false; error: string };
+
+export function parseNumber(input: string): Result<number> {
+  const n = Number(input);
+  return Number.isFinite(n) ? { ok: true, value: n } : { ok: false, error: "Not a number" };
+}
+```
+
+## Wrap-up
+
+The best TypeScript code reads like good documentation: clear names, predictable shapes, and errors that point you to the fix.

@@ -1,0 +1,146 @@
+---
+title: "CSS Grid: A Complete Guide to Modern Layouts"
+publishedAt: "2025-02-03"
+updatedAt: "2025-02-03"
+author: "Alex Mercer"
+summary: "Master CSS Grid from the ground up — covering tracks, areas, alignment, and real-world layout patterns you'll use every day."
+image: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&h=192&fit=crop"
+---
+
+Design systems are the backbone of consistent user interfaces. Here's how to build one that scales.
+
+## Why Design Systems Matter
+
+A well-crafted design system provides:
+
+- **Consistency** across all products
+- **Faster development** with reusable components
+- **Better collaboration** between designers and developers
+- **Reduced technical debt** over time
+
+## Core Principles
+
+### 1. Start with Tokens
+
+Design tokens are the atomic values of your system:
+
+```typescript title="tokens.ts"
+export const tokens = {
+  colors: {
+    primary: {
+      50: '#eff6ff',
+      500: '#3b82f6',
+      900: '#1e3a8a',
+    },
+    neutral: {
+      0: '#ffffff',
+      100: '#f5f5f5',
+      900: '#171717',
+    },
+  },
+  spacing: {
+    xs: '0.25rem',
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '1.5rem',
+    xl: '2rem',
+  },
+  radii: {
+    sm: '0.25rem',
+    md: '0.5rem',
+    lg: '1rem',
+    full: '9999px',
+  },
+} as const;
+```
+
+### 2. Build Primitive Components
+
+Start with the basics:
+
+```tsx title="Button.tsx"
+import { cva, type VariantProps } from "class-variance-authority";
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center rounded-md font-medium transition-colors",
+  {
+    variants: {
+      variant: {
+        primary: "bg-primary text-white hover:bg-primary/90",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+      },
+      size: {
+        sm: "h-8 px-3 text-sm",
+        md: "h-10 px-4",
+        lg: "h-12 px-6 text-lg",
+      },
+    },
+    defaultVariants: {
+      variant: "primary",
+      size: "md",
+    },
+  }
+);
+
+interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {}
+
+export function Button({ variant, size, className, ...props }: ButtonProps) {
+  return (
+    <button className={buttonVariants({ variant, size, className })} {...props} />
+  );
+}
+```
+
+## Component Composition
+
+Build complex components from primitives:
+
+| Level | Examples | Purpose |
+|-------|----------|---------|
+| Tokens | Colors, spacing, typography | Foundation |
+| Primitives | Button, Input, Badge | Building blocks |
+| Patterns | Card, Modal, Dropdown | Common UI patterns |
+| Templates | PageHeader, Sidebar | Layout structures |
+
+## Documentation is Key
+
+> "A design system without documentation is just a component library."
+
+Every component should include:
+
+1. **Usage examples** - Show common use cases
+2. **Props documentation** - Explain all options
+3. **Accessibility notes** - ARIA labels, keyboard nav
+4. **Do's and Don'ts** - Guide proper usage
+
+## Versioning Strategy
+
+```json title="package.json"
+{
+  "name": "@company/design-system",
+  "version": "2.1.0",
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "tailwindcss": "^3.0.0"
+  }
+}
+```
+
+Use semantic versioning:
+- **Major**: Breaking changes
+- **Minor**: New features (backward compatible)
+- **Patch**: Bug fixes
+
+## Conclusion
+
+Building a design system is an investment that pays dividends in:
+
+- Developer productivity
+- Design consistency
+- User experience
+- Team collaboration
+
+Start small, iterate often, and document everything.

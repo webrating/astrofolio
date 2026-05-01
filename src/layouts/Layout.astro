@@ -1,0 +1,149 @@
+---
+import "../styles/global.css";
+import { DATA } from "@/data/resume";
+import { CONFIG } from "@/data/config";
+import NavbarIsland from "@/components/NavbarIsland";
+import { FlickeringGrid } from "@/components/magicui/flickering-grid";
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  canonicalURL?: string;
+}
+
+const {
+  title,
+  description = DATA.description,
+  image,
+  canonicalURL = Astro.url.href,
+} = Astro.props;
+
+const pageTitle = title
+  ? CONFIG.seo.titleTemplate.replace("%s", title).replace("%n", DATA.name)
+  : DATA.name;
+const ogImage = image
+  ? image.startsWith("http") ? image : `${CONFIG.site.url}${image}`
+  : `${CONFIG.site.url}${DATA.ogImage}`;
+
+const { light, dark, radius } = CONFIG.theme;
+const { baseFontSize } = CONFIG.typography;
+---
+
+<html lang={CONFIG.site.locale.split("_")[0]} style={`font-size: ${baseFontSize}%;`}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- FOUC prevention: apply stored theme before first paint -->
+    <script is:inline>
+      (function () {
+        try {
+          var theme = localStorage.getItem("theme");
+          if (theme === "dark" || (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+            document.documentElement.classList.add("dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+          }
+        } catch (_) {}
+      })();
+    </script>
+
+    <!-- Theme variables from config.ts -->
+    <style set:html={`
+      :root {
+        --radius: ${radius};
+        --background: ${light.background};
+        --foreground: ${light.foreground};
+        --card: ${light.card};
+        --card-foreground: ${light.cardForeground};
+        --popover: ${light.popover};
+        --popover-foreground: ${light.popoverForeground};
+        --primary: ${light.primary};
+        --primary-foreground: ${light.primaryForeground};
+        --secondary: ${light.secondary};
+        --secondary-foreground: ${light.secondaryForeground};
+        --muted: ${light.muted};
+        --muted-foreground: ${light.mutedForeground};
+        --accent: ${light.accent};
+        --accent-foreground: ${light.accentForeground};
+        --destructive: ${light.destructive};
+        --border: ${light.border};
+        --input: ${light.input};
+        --ring: ${light.ring};
+      }
+      .dark {
+        --background: ${dark.background};
+        --foreground: ${dark.foreground};
+        --card: ${dark.card};
+        --card-foreground: ${dark.cardForeground};
+        --popover: ${dark.popover};
+        --popover-foreground: ${dark.popoverForeground};
+        --primary: ${dark.primary};
+        --primary-foreground: ${dark.primaryForeground};
+        --secondary: ${dark.secondary};
+        --secondary-foreground: ${dark.secondaryForeground};
+        --muted: ${dark.muted};
+        --muted-foreground: ${dark.mutedForeground};
+        --accent: ${dark.accent};
+        --accent-foreground: ${dark.accentForeground};
+        --destructive: ${dark.destructive};
+        --border: ${dark.border};
+        --input: ${dark.input};
+        --ring: ${dark.ring};
+      }
+    `} />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <!-- Primary meta -->
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Robots -->
+    <meta name="robots" content={CONFIG.seo.robots} />
+    <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
+
+    <!-- OpenGraph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content={DATA.name} />
+    <meta property="og:locale" content={CONFIG.site.locale} />
+    <meta property="og:image" content={ogImage} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content={CONFIG.seo.twitterCard} />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+  </head>
+  <body class="min-h-screen bg-background font-sans antialiased relative">
+    <!-- FlickeringGrid header background — matches template exactly -->
+    <div class="absolute inset-0 top-0 left-0 right-0 h-25 overflow-hidden z-0">
+      <FlickeringGrid
+        client:load
+        className="h-full w-full"
+        squareSize={2}
+        gridGap={2}
+        style={{
+          maskImage: "linear-gradient(to bottom, black, transparent)",
+          WebkitMaskImage: "linear-gradient(to bottom, black, transparent)",
+        }}
+      />
+    </div>
+
+    <!-- Main content wrapper — matches template's z-10 container exactly -->
+    <div class="relative z-10 max-w-2xl mx-auto py-12 pb-24 sm:py-24 px-6">
+      <slot />
+    </div>
+
+    <!-- Navbar: ThemeProvider + TooltipProvider + Navbar all in one React island -->
+    <NavbarIsland client:load />
+  </body>
+</html>

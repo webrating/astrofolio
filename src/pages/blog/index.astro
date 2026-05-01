@@ -1,0 +1,38 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import BlogList from "@/components/BlogList";
+import { getCollection } from "astro:content";
+import { paginate, normalizePage } from "@/lib/pagination";
+
+const PAGE_SIZE = 5;
+
+const allPosts = await getCollection("blog");
+const sortedPosts = [...allPosts].sort((a, b) => {
+  if (new Date(a.data.publishedAt) > new Date(b.data.publishedAt)) return -1;
+  return 1;
+});
+
+const pageParam = Astro.url.searchParams.get("page") ?? undefined;
+const totalPages = Math.ceil(sortedPosts.length / PAGE_SIZE);
+const currentPage = normalizePage(pageParam, totalPages);
+const { items: paginatedPosts, pagination } = paginate(sortedPosts, {
+  page: currentPage,
+  pageSize: PAGE_SIZE,
+});
+
+const posts = paginatedPosts.map((post) => ({
+  id: post.id,
+  title: post.data.title,
+  publishedAt: post.data.publishedAt,
+}));
+---
+
+<Layout title="Blog" description="Thoughts on software development, life, and more.">
+  <BlogList
+    client:load
+    posts={posts}
+    allPostsCount={sortedPosts.length}
+    pagination={pagination}
+    pageSize={PAGE_SIZE}
+  />
+</Layout>
